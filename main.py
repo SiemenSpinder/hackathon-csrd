@@ -1,6 +1,6 @@
 import os
 from mistralai.client import Mistral
-from src.prompts import system_prompt, user_text
+from src.prompts import system_prompt
 from src.models import ESRSResponse
 
 
@@ -21,6 +21,12 @@ model = "mistral-small-latest"
 
 client = Mistral(api_key=api_key)
 
+# ---- Read user content from markdown ----
+input_path = os.path.join(os.getenv("DATA_FOLDER"), 'input.md')
+if not os.path.isfile(input_path):
+    raise RuntimeError(f"Input markdown file not found: {input_path}")
+with open(input_path, "r", encoding="utf-8") as f:
+    user_text = f.read()
 
 # ---- Call Mistral with structured output ----
 chat_response = client.chat.parse(
