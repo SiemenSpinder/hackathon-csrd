@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple
 
 from mistralai.client import Mistral
 
-from src.models import ESRSResponse, ESRSResult
+from src.models import ESRSResponse, ESRSResult, Example
 from src.prompts import system_prompt
 
 
@@ -64,9 +64,9 @@ def _chunk_markdown(md: str, chunk_tokens: int, overlap_tokens: int) -> List[str
 
 def _merge_esrs_items(items_list: List[List[ESRSResult]]) -> List[ESRSResult]:
     """
-    Merge items from multiple chunks, deduplicating by (code, subtopic, subsubtopic).
+    Merge items from multiple chunks, deduplicating by (code, subcode, subtopic).
     - found: OR over chunks
-    - examples: union preserving order, capped at 2 per item
+    - examples: union preserving order by (sentence, category), capped at 2 per item
     - topic: normalized to match code family mapping
     """
     code_to_topic = {
@@ -78,26 +78,41 @@ def _merge_esrs_items(items_list: List[List[ESRSResult]]) -> List[ESRSResult]:
 
     merged: Dict[Tuple[str, str, str], ESRSResult] = {}
 
+    def _dedup_examples(examples: List[Example]) -> List[Example]:
+        seen = set()
+        out: List[Example] = []
+        for ex in examples:
+            sentence = (ex.sentence or "").strip()
+            category = (ex.category or "").strip().lower()
+            key = (sentence, category)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(ex)
+            if len(out) >= 2:
+                break
+        return out
+
     for items in items_list:
         for it in items:
-            key = (it.code, it.subtopic, it.subsubtopic)
+            key = (it.code, it.subcode, it.subtopic)
             if key not in merged:
                 # normalize topic to guarantee consistency
                 topic = code_to_topic.get(it.code, it.topic)
                 merged[key] = ESRSResult(
                     code=it.code,
                     topic=topic,
+                    subcode=it.subcode,
                     subtopic=it.subtopic,
-                    subsubtopic=it.subsubtopic,
                     found=it.found,
-                    examples=list(dict.fromkeys(it.examples))[:2],
+                    examples=_dedup_examples(list(it.examples)),
                 )
             else:
                 acc = merged[key]
                 acc.found = acc.found or it.found
                 # merge examples with order-preserving de-dup
-                merged_examples = list(dict.fromkeys(acc.examples + it.examples))
-                acc.examples = merged_examples[:2]
+                merged_examples = _dedup_examples(list(acc.examples) + list(it.examples))
+                acc.examples = merged_examples
                 # ensure topic consistency
                 acc.topic = code_to_topic.get(acc.code, acc.topic)
 
