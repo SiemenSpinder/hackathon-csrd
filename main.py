@@ -3,6 +3,19 @@ from mistralai.client import Mistral
 from src.prompts import system_prompt
 from src.models import ESRSResponse
 
+import re
+
+def clean_markdown(md: str) -> str:
+    # remove code blocks
+    md = re.sub(r"```.*?```", "", md, flags=re.DOTALL)
+    
+    # normalize quotes
+    md = md.replace('"', "'")
+    
+    # collapse excessive whitespace
+    md = re.sub(r"\n{3,}", "\n\n", md)
+    
+    return md
 
 # Load environment variables from .env if available
 try:
@@ -28,6 +41,9 @@ if not os.path.isfile(input_path):
 with open(input_path, "r", encoding="utf-8") as f:
     user_text = f.read()
 
+user_text = clean_markdown(user_text)
+
+
 # ---- Call Mistral with structured output ----
 chat_response = client.chat.parse(
     model=model,
@@ -36,7 +52,7 @@ chat_response = client.chat.parse(
         {"role": "user", "content": user_text},
     ],
     response_format=ESRSResponse,   # 👈 structured output schema
-    max_tokens=1024,
+    max_tokens=10000,
     temperature=0
 )
 
