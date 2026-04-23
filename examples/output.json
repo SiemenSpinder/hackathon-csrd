@@ -1,0 +1,715 @@
+{
+  "rick_output_Airbus_2024.json": {
+    "disclosures": [
+      {
+        "code": "E2-1",
+        "title": "Policies on pollution",
+        "description": "Policies for prevention, control and remediation of pollution across air, water and soil.",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "The Airbus Environmental Policy, described under section '6.2.1 Policies', emphasises the importance of addressing substances of concern by driving the development of solutions aimed at substituting and reducing the use of regulated substances throughout the product life cycle."
+          },
+          {
+            "quote": "The Airbus Environmental Policy outlines the Company's guiding principles, vision, mission, and associated initiatives relating to environmental sustainability. This policy applies to the Company's own operations, therefore including to affiliates where the Company owns more than half of the voting rights or has the right to appoint the majority of the Board directors."
+          },
+          {
+            "quote": "The policy mandates the development of products and services that minimise environmental impacts, particularly addressing climate change, pollution, and resource use."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E2-2",
+        "title": "Actions and resources for pollution",
+        "description": "Actions and financial/operational resources allocated to pollution prevention and reduction.",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The Company works with suppliers and the wider industry with the aim of developing suitable alternatives to the Company's uses of such substances and actively promotes the development and use of suitable alternatives, across product life-cycles."
+          },
+          {
+            "quote": "The Company monitors Volatile Organic Compounds (VOC) emissions to identify the main emitters of VOC within its industrial processes. The VOC emissions are directly measured where required by regulation or calculated through a mass-balance approach."
+          },
+          {
+            "quote": "the Company incurs and in the future will continue to incur expenditures related to costs to limit, avoid, reduce and control emissions to the environment; investments in improving waste management technologies; management of potential obsolescence; and obligations relating to the manufacturing and composition of the Company's products"
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Number of regulated substances impact analysed",
+            "value": 16000.0,
+            "unit": "No.",
+            "year": 2024
+          },
+          {
+            "name": "Number of substances for which substitutes were qualified and deployed",
+            "value": 509.0,
+            "unit": "No.",
+            "year": 2024
+          },
+          {
+            "name": "Number of mixtures for which substitutes were qualified and deployed",
+            "value": 558.0,
+            "unit": "No.",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E2-3",
+        "title": "Pollution targets",
+        "description": "Quantified targets for reducing emissions to air, water and soil.",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "VOC emissions in absolute terms | tons | 2030 | 1,498 | 0% increase | 2015 | 1,498 | 1,230 | -18%"
+          },
+          {
+            "quote": "The Company's targets include reducing purchased energy by 20%, reducing the amount of waste produced by 20%, reducing water withdrawal by 25%, and keeping the Company's emissions of volatile organic compounds (VOC) at current levels (even as the industrial ramp-up progresses). All targets are for 2030, against a 2015 baseline."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "VOC emissions target value",
+            "value": 1498.0,
+            "unit": "tons",
+            "year": 2030
+          },
+          {
+            "name": "VOC baseline value",
+            "value": 1498.0,
+            "unit": "tons",
+            "year": 2015
+          },
+          {
+            "name": "VOC 2024 value",
+            "value": 1230.0,
+            "unit": "tons",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E2-4",
+        "title": "Pollution of air, water and soil",
+        "description": "Quantitative emissions to air, water and soil (e.g. NOx, SOx, PFAS, heavy metals).",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Emissions Metrics - Pollution of Air | Unit | 2024  | VOC | tons | 155  | VOC on Target perimeter \u000b| tons | 1,230"
+          },
+          {
+            "quote": "Only the Hamburg site exceeds the threshold specified in ESRS E2 for VOC reporting (as per Annex II of Regulation (EC) No 166/2006)."
+          },
+          {
+            "quote": "Number of facilities exceeding the 100 tonnes threshold for VOC emissions listed in the E-PRTR regulation Annex II. 1 (Hamburg)"
+          }
+        ],
+        "metrics": [
+          {
+            "name": "VOC",
+            "value": 155.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "VOC on Target perimeter",
+            "value": 1230.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Number of facilities exceeding the 100 tonnes threshold for VOC emissions",
+            "value": 1.0,
+            "unit": "facilities",
+            "year": null
+          }
+        ]
+      },
+      {
+        "code": "E2-5",
+        "title": "Substances of concern",
+        "description": "Use, production or release of hazardous and SVHC substances and substitution measures.",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The Company manages substance-related IROs in line with the regulatory requirements and their provisions related to substance traceability, based on information on product composition received by the Company from its suppliers."
+          },
+          {
+            "quote": "The precise quantity (mass) of substances in a product is not made available to the Company, and the available data does not allow the Company to calculate the quantity of substances in products/articles and mixtures."
+          },
+          {
+            "quote": "Substances of (very high) concern: There is a risk that the Company or its suppliers may not be in a position to substitute substances of concern or of very high concern in due time in accordance with regulatory requirements."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Number of regulated substances impact analysed",
+            "value": 16000.0,
+            "unit": "No.",
+            "year": 2024
+          },
+          {
+            "name": "Number of substances for which substitutes were qualified and deployed",
+            "value": 509.0,
+            "unit": "No.",
+            "year": 2024
+          },
+          {
+            "name": "Number of mixtures for which substitutes were qualified and deployed",
+            "value": 558.0,
+            "unit": "No.",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E2-6",
+        "title": "Financial effects from pollution risks and opportunities",
+        "description": "Expected financial impacts from pollution-related risks and opportunities.",
+        "standard": "E2",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "There is a risk that the Company or its suppliers may not be in a position to substitute substances of concern or of very high concern in due time in accordance with regulatory requirements. This could lead to business disruption across the value chain and to the Company not being able to deliver aircraft to its customers, which could negatively affect financial performance and damage its reputation."
+          },
+          {
+            "quote": "Any obligation to provide compensation for such losses or damages or other enforcement or penalty actions in relation to environmental matters could have a significant adverse effect on the Company's reputation, business, results of operations and financial condition."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E3-1",
+        "title": "Water and marine resources policies",
+        "description": "Policies for sustainable water management and marine ecosystem protection.",
+        "standard": "E3",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The Airbus Environmental Policy and Environmental Management System, described under section '- 6.2.1. Policies', emphasises the Company's commitment to sustainable practices in its operations. A focus of the Environmental Policy is on water, where the Company aims to continually explore and implement innovative technologies and solutions aiming to reduce the environmental footprint of its activities, including regarding water."
+          },
+          {
+            "quote": "The Company continued to advance its high 5+ programme, which provides the overarching framework for the reduction of environmental impacts from Airbus' operations."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E3-2",
+        "title": "Water-related actions and resources",
+        "description": "Actions and investments to reduce water use and prevent water pollution.",
+        "standard": "E3",
+        "is_present": true,
+        "confidence": 0.92,
+        "evidence": [
+          {
+            "quote": "The Company undertakes improvement of water metering and monitoring to better understand water usage and identify deviations and abnormalities. Notable implementations in 2024 include the deployment of digitised and automated real-time water withdrawal monitoring at Company's sites in Spain and France."
+          },
+          {
+            "quote": "The Company develops water recycling and water reuse systems. For example, in 2024, Company sites have adapted processes and equipment to establish closed-loop systems where water is being reused, such as in the press cooling systems in Bremen, Germany."
+          },
+          {
+            "quote": "This analysis allowed to identify that the Company operates facilities located in high or extremely high water stress areas in Chile, China, France, Germany, India, Italy, Mexico, Morocco, Portugal, Saudi Arabia, South Africa, Spain, Thailand, Tunisia, UK, US."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E3-3",
+        "title": "Water targets",
+        "description": "Quantified targets for water withdrawal, reuse, and wastewater quality.",
+        "standard": "E3",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Water withdrawal-related KPI | m3 | 2030 | 3,225,016 | -25% | 2015 | 4,300,021 | 3,510,180 | -18%"
+          },
+          {
+            "quote": "The Company's targets include reducing purchased energy by 20%, reducing the amount of waste produced by 20%, reducing water withdrawal by 25%, and keeping the Company's emissions of volatile organic compounds (VOC) at current levels (even as the industrial ramp-up progresses). All targets are for 2030, against a 2015 baseline."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Water withdrawal-related KPI target value",
+            "value": 3225016.0,
+            "unit": "m3",
+            "year": 2030
+          },
+          {
+            "name": "Water withdrawal-related KPI baseline value",
+            "value": 4300021.0,
+            "unit": "m3",
+            "year": 2015
+          },
+          {
+            "name": "Water withdrawal-related KPI 2024 value",
+            "value": 3510180.0,
+            "unit": "m3",
+            "year": 2024
+          },
+          {
+            "name": "Water withdrawal reduction target",
+            "value": 25.0,
+            "unit": "%",
+            "year": 2030
+          }
+        ]
+      },
+      {
+        "code": "E3-4",
+        "title": "Water withdrawal and consumption",
+        "description": "Total water withdrawal and consumption by source and region, including water-stressed areas.",
+        "standard": "E3",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Water Metrics | Unit | 2024  | Total water consumption | m3 | 595,418  | Total water consumption in areas of high water stress | m3 | 256,355  | Total water withdrawal | m3 | 3,499,794"
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Total water consumption",
+            "value": 595418.0,
+            "unit": "m3",
+            "year": 2024
+          },
+          {
+            "name": "Total water consumption in areas of high water stress",
+            "value": 256355.0,
+            "unit": "m3",
+            "year": 2024
+          },
+          {
+            "name": "Total water withdrawal",
+            "value": 3499794.0,
+            "unit": "m3",
+            "year": 2024
+          },
+          {
+            "name": "Water intensity",
+            "value": 8.6,
+            "unit": "m3/M€",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E3-5",
+        "title": "Financial effects from water risks",
+        "description": "Financial impacts from physical and regulatory water-related risks.",
+        "standard": "E3",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "Procuring the required water does not currently represent a material cost for the Company as overall withdrawn volumes are relatively limited, especially for its industrial operations. However, securing water availability to operate the industrial processes requiring water is critical for the Company to ensure business continuity."
+          },
+          {
+            "quote": "Water consumption and withdrawal: There is a risk that the Company or its suppliers may fail to mitigate the potential impact of water stress—related to climate change—on water consumption, usage and withdrawal in their industrial operations, within a timely manner relative to the onset of such risks. This could lead to production disruptions, which could negatively affect financial performance."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E4-1",
+        "title": "Biodiversity transition plan",
+        "description": "Alignment with EU Biodiversity Strategy 2030 and Global Biodiversity Framework.",
+        "standard": "E4",
+        "is_present": false,
+        "confidence": 0.9,
+        "evidence": [],
+        "metrics": []
+      },
+      {
+        "code": "E4-2",
+        "title": "Biodiversity policies",
+        "description": "Policies to prevent, mitigate and restore biodiversity impacts.",
+        "standard": "E4",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The Company has not adopted a policy specifically on biodiversity. The Environmental Policy (see section '- 6.2.1. Policies') applies to topics related to the biodiversity IROs. In addition, while the Company's sites ISO 14001 certification embeds biodiversity considerations, processes and actions supporting the local management of biodiversity are also defined to facilitate compliance to local applicable regulatory requirements."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E4-3",
+        "title": "Biodiversity actions and resources",
+        "description": "Mitigation hierarchy actions (avoid, reduce, restore, compensate).",
+        "standard": "E4",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "The Company has not defined actions on biodiversity, as the actions implemented to address climate change topics are deemed to simultaneously address biodiversity IRO. For more information, please refer to section '- 6.2.2.5 Actions and resources (E1-3)'."
+          },
+          {
+            "quote": "Around 49,000 km² of satellite imagery was provided to six partner organisations, with data covering 21 countries, helping organisations to respond to forced displacement resulting from protracted humanitarian crises and environmental emergencies, such as flooding."
+          },
+          {
+            "quote": "Partnering with the Connected Conservation Foundation on the Satellites for Biodiversity Award, almost 16,000 km² of satellite imagery was provided to winning projects addressing topics such as human-wildlife conflict, anti-poaching and biodiversity conservation."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E4-4",
+        "title": "Biodiversity targets",
+        "description": "Targets for habitat and ecosystem protection and restoration.",
+        "standard": "E4",
+        "is_present": false,
+        "confidence": 0.9,
+        "evidence": [],
+        "metrics": []
+      },
+      {
+        "code": "E4-5",
+        "title": "Biodiversity impact metrics",
+        "description": "Land use, land conversion, habitat impact, and endangered species effects.",
+        "standard": "E4",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Number of sites located near biodiversity-sensitive areas 15"
+          },
+          {
+            "quote": "None of these activities have been associated with a material negative impact on local biodiversity."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Number of sites located near biodiversity-sensitive areas",
+            "value": 15.0,
+            "unit": "sites",
+            "year": null
+          }
+        ]
+      },
+      {
+        "code": "E4-6",
+        "title": "Financial effects from biodiversity risks",
+        "description": "Financial impacts from ecosystem dependency and biodiversity risks.",
+        "standard": "E4",
+        "is_present": false,
+        "confidence": 0.9,
+        "evidence": [],
+        "metrics": []
+      },
+      {
+        "code": "E5-1",
+        "title": "Resource use policies",
+        "description": "Policies to reduce virgin material use and improve circularity.",
+        "standard": "E5",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The Airbus Environmental Policy outlines the Company's commitment to reducing environmental impact during production and throughout the product life cycle, eco-design, circularity, and end-of-life considerations (including waste management in its own industrial operations). The Policy focuses on minimising resource depletion (including virgin resources) and the increased use of secondary materials."
+          },
+          {
+            "quote": "The policy mandates the development of products and services that minimise environmental impacts, particularly addressing climate change, pollution, and resource use."
+          },
+          {
+            "quote": "The Company is deploying frameworks enabling design choices to reduce the footprint of operations, projects and products and optimise aspects such as product end-of-life management and critical raw materials usage."
+          }
+        ],
+        "metrics": []
+      },
+      {
+        "code": "E5-2",
+        "title": "Circular economy actions",
+        "description": "Eco-design, recycling, reuse, and product lifecycle extension measures.",
+        "standard": "E5",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "This report is printed on Amadeus White Silk 300gsm and Amadeus White Silk 150gsm. Both are woodfree triple coated, produced from locally sourced FSC-certified pulp and recycled materials."
+          },
+          {
+            "quote": "The Company's circularity approach, that includes in-sourcing and waste management dimensions, relies on several complementary levers: 'Avoid' or material use optimisation - Weight reduction through material use optimisation... 'Recycle' - The Company is developing, in collaboration with relevant suppliers, closed-loop scrap recycling systems for titanium."
+          },
+          {
+            "quote": "In addition, the Company provides maintenance, repair, and overhaul ('MRO') and other services for commercial, military, and helicopter operators ... and end-of-life and recycling services through initiatives such as TARMAC Aerosave, which specialises in aircraft decommissioning."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Titanium recycled",
+            "value": 400.0,
+            "unit": "tonnes",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E5-3",
+        "title": "Circular economy targets",
+        "description": "Targets for waste reduction, recycling, and secondary material use.",
+        "standard": "E5",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Waste produced excluding exceptional waste | tons | Target year 2030 | Target value 90,764 | -20% | Baseline year 2015 | Baseline value 113,455 | 2024 value 89,387 | -21%"
+          },
+          {
+            "quote": "The Company's targets include reducing purchased energy by 20%, reducing the amount of waste produced by 20%, reducing water withdrawal by 25%, and keeping the Company's emissions of volatile organic compounds (VOC) at current levels (even as the industrial ramp-up progresses). All targets are for 2030, against a 2015 baseline."
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Waste produced (non-exceptional) target value",
+            "value": 90764.0,
+            "unit": "tons",
+            "year": 2030
+          },
+          {
+            "name": "Waste baseline value",
+            "value": 113455.0,
+            "unit": "tons",
+            "year": 2015
+          },
+          {
+            "name": "Non-exceptional waste 2024 value",
+            "value": 89387.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Waste reduction target",
+            "value": 20.0,
+            "unit": "%",
+            "year": 2030
+          }
+        ]
+      },
+      {
+        "code": "E5-4",
+        "title": "Resource inflows",
+        "description": "Total material input including primary and secondary raw materials.",
+        "standard": "E5",
+        "is_present": false,
+        "confidence": 0.9,
+        "evidence": [],
+        "metrics": []
+      },
+      {
+        "code": "E5-5",
+        "title": "Waste generation and streams",
+        "description": "Total waste and treatment methods (recycling, incineration, landfill).",
+        "standard": "E5",
+        "is_present": true,
+        "confidence": 0.95,
+        "evidence": [
+          {
+            "quote": "Resources use & Circular Economy Metrics - Waste | Unit | 2024  | Total amount of waste generated in Company's own operations | tons | 229,389  | Total amount of waste diverted from disposal by recovery operations | tons | 207,469  | Total amount of waste directed to disposal | tons | 21,920"
+          },
+          {
+            "quote": "Over 400 tonnes of titanium waste was able to be recycled using this process in 2024."
+          },
+          {
+            "quote": "the opening of the Airbus Lifecycle Services Centre in Chengdu, China... offers solutions to manage various stages of the lifecycle of an aircraft from aircraft storage to maintenance, upgrades, conversions, dismantling and recycling"
+          }
+        ],
+        "metrics": [
+          {
+            "name": "Total amount of waste generated in Company's own operations",
+            "value": 229389.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Total amount of waste diverted from disposal by recovery operations",
+            "value": 207469.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Total amount of waste directed to disposal",
+            "value": 21920.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Total amount of hazardous waste",
+            "value": 26162.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Total amount of waste generated - own operations and operationally controlled entities",
+            "value": 230225.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Of which, non-exceptional waste (Company's target related metric)",
+            "value": 89387.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "% waste directed to disposal",
+            "value": 9.5,
+            "unit": "%",
+            "year": 2024
+          },
+          {
+            "name": "Total amount of non-recycled waste",
+            "value": 60653.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Amount of hazardous waste diverted to recovery operations",
+            "value": 15236.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Amount of non-hazardous waste diverted to recovery operations",
+            "value": 192233.0,
+            "unit": "tons",
+            "year": 2024
+          },
+          {
+            "name": "Titanium recycled",
+            "value": 400.0,
+            "unit": "tonnes",
+            "year": 2024
+          }
+        ]
+      },
+      {
+        "code": "E5-6",
+        "title": "Financial effects from resource risks",
+        "description": "Financial impacts from material scarcity and circular economy opportunities.",
+        "standard": "E5",
+        "is_present": true,
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "quote": "The risk of titanium supply disruption could have an impact on aircraft production and deliveries, which could affect financial performance."
+          },
+          {
+            "quote": "Risk - Inflow: The risk of titanium supply disruption could have an impact on aircraft production and deliveries, which could affect financial performance."
+          }
+        ],
+        "metrics": []
+      }
+    ],
+    "ntp_scoring": {
+      "foundations": {
+        "score": 2,
+        "maturity": "Coherent",
+        "weight": 25,
+        "weighted_contribution": 16.7,
+        "rationale": "Airbus discloses a structured materiality / IRO process covering climate, pollution, water and biodiversity, screens Scope 3 and prioritises the major use-phase impact, and uses recognised tools (e.g., WRI Aqueduct) to set site-level context — but there is no evidence of explicit adoption of TNFD/SBTN or of comprehensive multi-scale mapping of biodiversity (KBAs) or explicit alignment to Kunming‑Montreal, so it stops short of the highest maturity.",
+        "evidence": [
+          {
+            "quote": "The Company has performed a screening of all Scope 3 categories and concluded that category 11 'Use of Sold Product' is the only significant category to be disclosed."
+          },
+          {
+            "quote": "The biodiversity-related IROs are an indirect effect of the Company's climate change (section '- 6.2.2.1 Climate change IROs') and pollution (section '- 6.3.2.1 Pollution IROs') related IROs."
+          },
+          {
+            "quote": "The target was defined in collaboration with impacted functions such as Facility Management, Environment, Health and Safety and Industrial Operations and was validated by the Airbus Industrial Environmental Roadmap cross-divisional Steering Committee. The target is informed by projected local water stress levels according to the World Resources Institute Aqueduct Water Risk Atlas, version 4.0 (dated August 2023), using the Aqueduct 2030 'pessimistic' scenario (aligned with the Company scenario 'Disorderly mitigation – Warming exceeding 3°C' which includes the data from IPCC SSP5 RCP8.5)."
+          }
+        ]
+      },
+      "metrics_and_targets": {
+        "score": 3,
+        "maturity": "Credible",
+        "weight": 20,
+        "weighted_contribution": 20.0,
+        "rationale": "Airbus publishes comprehensive, quantitative ESRS-style metrics (Scopes 1–3, biogenic, VOCs, water, waste) and sets multi‑year targets with time horizons; its GHG targets are SBTi‑validated and water targets are contextualised to local stress (Aqueduct), fulfilling the criteria for science/contextual targets and broad value‑chain coverage of the material category.",
+        "evidence": [
+          {
+            "quote": "The Company has established  $\u0000CO_{2}$  reduction targets for Scopes 1, 2, and Scope 3 Use of Sold Products emissions, which have been validated by SBTi (see section '- 6.2.2.2 Transition plan for climate change mitigation (E1-1))'."
+          },
+          {
+            "quote": "| Total Gross indirect (Scope 3) GHG emissions | ktCO2eq | 474,691 |"
+          },
+          {
+            "quote": "The Company has set the following 2030 target (vs. 2015 baseline): -25% reduction in absolute water withdrawal volumes defined by the Company as the sum of purchased water, abstracted groundwater and surface water withdrawal whilst excluding collected rainwater, reclaimed water, brackish coastal water, and 'non-contact' water used for geothermal energy generation or heating/cooling; this metric is referred to as 'water withdrawal-related KPI'. It applies to the Company's own operations and operationally controlled entities."
+          }
+        ]
+      },
+      "implementation_strategy": {
+        "score": 2,
+        "maturity": "Coherent",
+        "weight": 30,
+        "weighted_contribution": 20.0,
+        "rationale": "The Company presents a range of concrete operational actions across its operations and supply chain (avoid/reduce/restore steps), has applied an internal carbon price in CapEx/product decisions and cascades site-specific water targets, and commits CapEx/OpEx processes — but disclosures lack fully site-level financed plans across all material impacts and dedicated, project-level financing mechanisms for nature restoration.",
+        "evidence": [
+          {
+            "quote": "The integrated internal pricing mechanism factors the internal carbon price into net present value and internal rate of return calculations as part of business case evaluations."
+          },
+          {
+            "quote": "These efforts fall under the 'avoid pollution' and 'reduce pollution' steps of the pollution mitigation hierarchy."
+          },
+          {
+            "quote": "To achieve this Company-wide target, the Company has cascaded site-specific targets, acknowledging that the criticality of water challenges is heavily influenced by local factors."
+          }
+        ]
+      },
+      "engagement_strategy": {
+        "score": 3,
+        "maturity": "Credible",
+        "weight": 15,
+        "weighted_contribution": 15.0,
+        "rationale": "Airbus demonstrates structured engagement: supplier due‑diligence (SMA) and targeted on‑site assessments with published coverage numbers, formal social dialogue bodies (SEWC/AGF), and explicit public affairs/lobbying rules; it even requires FPIC and community considerations for carbon projects — meeting high‑quality engagement expectations including Indigenous/community safeguards and disclosure of lobbying charter.",
+        "evidence": [
+          {
+            "quote": "Sourcing volume having undergone an SMA | % | 86%"
+          },
+          {
+            "quote": "Number of on-site assessments conducted on supplier sites | No. | 50"
+          },
+          {
+            "quote": "Recognised quality standards for carbon credits are those that are verifiable by independent third parties, make requirements and project reports publicly available and at a minimum ensure additionality, permanence, avoidance of double counting and provide rules for calculation, monitoring, and verification of the project's GHG emissions. ... On top of the core criteria mentioned above, societal aspects are considered, such as prevention of child labour, respect of human rights and relations with the communities surrounding the projects (FPIC process) and co-benefits strategy."
+          }
+        ]
+      },
+      "governance": {
+        "score": 2,
+        "maturity": "Coherent",
+        "weight": 10,
+        "weighted_contribution": 6.7,
+        "rationale": "There is board-level sustainability oversight (Ethics, Compliance and Sustainability Committee) and the Board has linked the company's climate CO₂ reduction target to executive variable remuneration, showing governance integration of environmental objectives; however disclosures are climate-focused and do not demonstrate nature-specific KPIs in remuneration, nor formal training/programmes for nature expertise, so advanced (score 3) is not warranted.",
+        "evidence": [
+          {
+            "quote": "in order to support the Company's target of reducing its Scope 1 and 2 carbon emissions by 63% by 2030, the Board of Directors decided to translate this ambition into a concrete objective and include the CO₂ reduction target in the collective variable remuneration of the CEO and all executives."
+          },
+          {
+            "quote": "Fixum includes a base fee for Board membership and the relevant Committee membership as the case may be (Audit Committee, Remuneration, Nomination and Governance Committee ('RNGC') and Ethics, Compliance and Sustainability Committee ('ECSC')."
+          },
+          {
+            "quote": "For more information about the transition plan and the decarbonisation levers, please refer to section 6.2.2.2 Transition plan for climate change mitigation (E1-1), in the Sustainability Statement."
+          }
+        ]
+      },
+      "total_score": 78.3
+    }
+  }
+}

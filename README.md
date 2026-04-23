@@ -95,7 +95,7 @@ Results are written to `data/output.json` and a summary is printed to the consol
 ### Launch the dashboard
 
 ```bash
-streamlit run src/app_2.py
+streamlit run src/streamlit_app.py
 ```
 
 The dashboard lets you filter disclosures by ESRS code, presence status, or keyword, and drill into evidence quotes and extracted metrics.

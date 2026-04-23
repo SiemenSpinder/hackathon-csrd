@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # ── Load data ──────────────────────────────────────────────────────────────────
-DATA_FILE = Path(__file__).parent / "siemen_output.json"
+DATA_FILE = "examples/output.json"
 
 @st.cache_data
 def load_documents(path: Path) -> dict:
