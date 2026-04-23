@@ -89,6 +89,14 @@ class NTPScoringResult(BaseModel):
 
 
 # =========================
+# SPLIT EXTRACTION RESULTS
+# =========================
+
+class ESRSExtractionResult(BaseModel):
+    disclosures: List[DisclosureExtraction]
+
+
+# =========================
 # COMBINED EXTRACTION RESULT
 # =========================
 

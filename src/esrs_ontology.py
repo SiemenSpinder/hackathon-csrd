@@ -284,8 +284,8 @@ def enrich_with_ontology(
             "standard": definition["standard"],
             "is_present": d.is_present if hasattr(d, "is_present") else d["is_present"],
             "confidence": d.confidence if hasattr(d, "confidence") else d["confidence"],
-            "evidence": d.evidence if hasattr(d, "evidence") else d["evidence"],
-            "metrics": d.metrics if hasattr(d, "metrics") else d["metrics"],
+            "evidence": [e.model_dump() for e in d.evidence] if hasattr(d, "evidence") else d["evidence"],
+            "metrics": [m.model_dump() for m in d.metrics] if hasattr(d, "metrics") else d["metrics"],
         })
 
     result: Dict[str, Any] = {"disclosures": enriched_disclosures}
