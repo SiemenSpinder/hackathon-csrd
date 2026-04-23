@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(wsl -d Ubuntu -- bash -c \"cd /home/sspinder/projects/hackathon-csrd && pip install mistralai 2>&1 | tail -5\")",
+      "PowerShell(wsl -d Ubuntu -- bash -c \"cd /home/sspinder/projects/hackathon-csrd && pip install mistralai --break-system-packages 2>&1 | tail -5\")"
+    ]
+  }
+}
