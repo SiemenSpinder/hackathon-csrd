@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{COMPANY}} {{YEAR}} · CSRD Environmental Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07101f;
+      --surface: #0c1828;
+      --card:    #101f35;
+      --card2:   #162844;
+      --border:  #1c3050;
+      --green:   #10b981;
+      --green2:  #34d399;
+      --blue:    #3b82f6;
+      --amber:   #f59e0b;
+      --red:     #ef4444;
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+      --muted2:  #94a3b8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16,185,129,.07) 0%, transparent 60%);
+    }
+
+    /* ── HEADER ──────────────────────────────────────── */
+    header {
+      padding: 3.5rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,.018) 80px),
+        repeating-linear-gradient(0deg,  transparent, transparent 79px, rgba(255,255,255,.018) 80px);
+      pointer-events: none;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(16,185,129,.3);
+      color: var(--green);
+      padding: .25rem .9rem;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      background: linear-gradient(135deg, #e2e8f0 30%, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: .4rem;
+    }
+
+    header .subtitle {
+      color: var(--muted2);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .score-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 2.5rem;
+      background: rgba(16,185,129,.05);
+      border: 1px solid rgba(16,185,129,.18);
+      border-radius: 1.5rem;
+      padding: 1.75rem 2.5rem;
+    }
+
+    .gauge-wrap { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
+
+    .gauge-label {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .gauge-label .num { display: block; font-size: 2.4rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .gauge-label .den { display: block; font-size: .72rem; color: var(--muted); font-weight: 500; }
+
+    .score-meta h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .35rem; }
+    .score-meta p  { color: var(--muted2); font-size: .9rem; max-width: 280px; }
+
+    /* ── LAYOUT ──────────────────────────────────────── */
+    main { max-width: 1380px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    section { margin-bottom: 3.5rem; }
+
+    .sec-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .sec-title .icon {
+      width: 2rem; height: 2rem;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(16,185,129,.25);
+      border-radius: .5rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
+    .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: .9rem;
+      padding: 2rem;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 1rem;
+    }
+
+    /* ── NTP ─────────────────────────────────────────── */
+    .ntp-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .radar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+    }
+
+    .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .dim-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: .875rem;
+      padding: 1.25rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .dim-card:hover { border-color: rgba(16,185,129,.4); box-shadow: 0 0 20px rgba(16,185,129,.06); }
+
+    .dim-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .7rem; }
+
+    .dim-name { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted2); }
+    .dim-score { font-size: 1.6rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .dim-score sub { font-size: .75rem; color: var(--muted); font-weight: 400; }
+
+    .maturity-badge {
+      display: inline-block;
+      padding: .18rem .55rem;
+      border-radius: 999px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+
+    .m-Credible { background: rgba(16,185,129,.14); color: #10b981; border: 1px solid rgba(16,185,129,.3); }
+    .m-Coherent { background: rgba(59,130,246,.14);  color: #3b82f6; border: 1px solid rgba(59,130,246,.3); }
+    .m-Aware    { background: rgba(245,158,11,.14);  color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+    .m-default  { background: rgba(148,163,184,.1);  color: #94a3b8; border: 1px solid rgba(148,163,184,.2); }
+
+    .dim-rationale { font-size: .77rem; color: var(--muted2); line-height: 1.5; }
+
+    .dim-weight-bar { margin-top: .75rem; display: flex; align-items: center; gap: .5rem; }
+    .dw-track { flex: 1; height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .dw-fill  { height: 100%; background: var(--green); border-radius: 999px; opacity: .5; }
+    .dw-label { font-size: .68rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── STANDARDS ───────────────────────────────────── */
+    .standards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
+
+    .std-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      transition: border-color .2s;
+    }
+
+    .std-card:hover { border-color: rgba(16,185,129,.3); }
+
+    .std-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding-bottom: .875rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .std-code  { font-size: 1.5rem; font-weight: 800; color: var(--green); }
+    .std-name  { font-size: .75rem; color: var(--muted2); margin-top: .1rem; }
+
+    .std-coverage { text-align: right; }
+    .std-coverage .num { font-size: 1.6rem; font-weight: 800; }
+    .std-coverage .den { font-size: .8rem; color: var(--muted); }
+
+    .disc-rows { display: flex; flex-direction: column; gap: .4rem; }
+
+    .disc-row {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .45rem .6rem;
+      border-radius: .4rem;
+      cursor: pointer;
+      transition: background .12s;
+      border: 1px solid transparent;
+    }
+
+    .disc-row:hover { background: var(--card2); border-color: var(--border); }
+
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dot-present { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,.5); }
+    .dot-absent  { background: var(--red);   box-shadow: 0 0 6px rgba(239,68,68,.4); }
+
+    .disc-code  { font-size: .72rem; font-weight: 700; color: var(--muted2); min-width: 36px; }
+    .disc-title { font-size: .78rem; flex: 1; }
+
+    .conf-bar  { width: 42px; height: 3px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .conf-fill { height: 100%; background: var(--green); border-radius: 999px; }
+
+    /* ── TARGETS ─────────────────────────────────────── */
+    .targets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+
+    .tgt-card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+
+    .tgt-standard {
+      display: inline-block;
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--green);
+      background: rgba(16,185,129,.1);
+      border: 1px solid rgba(16,185,129,.2);
+      padding: .1rem .45rem; border-radius: 999px;
+      margin-bottom: .5rem;
+    }
+
+    .tgt-label { font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: .6rem; }
+
+    .tgt-current { font-size: 1.7rem; font-weight: 800; color: var(--text); margin-bottom: .15rem; }
+    .tgt-current small { font-size: .78rem; font-weight: 400; color: var(--muted); }
+
+    .tgt-delta { font-size: .72rem; color: var(--green); margin-bottom: .75rem; }
+
+    .tgt-year-labels { display: flex; justify-content: space-between; font-size: .68rem; color: var(--muted); margin-bottom: .35rem; }
+
+    .prog-track {
+      height: 8px; background: var(--border); border-radius: 999px;
+      overflow: hidden; margin-bottom: .35rem;
+    }
+
+    .prog-fill {
+      height: 100%; border-radius: 999px; width: 0;
+      transition: width 1.6s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .prog-green    { background: linear-gradient(90deg, #059669, #10b981); }
+    .prog-exceeded { background: linear-gradient(90deg, #10b981, #34d399); }
+
+    .tgt-edge-labels { display: flex; justify-content: space-between; font-size: .68rem; color: var(--muted); margin-bottom: .6rem; }
+
+    .status-tag {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .2rem .65rem; border-radius: 999px;
+      font-size: .72rem; font-weight: 700;
+    }
+
+    .s-ontrack  { background: rgba(16,185,129,.12); color: #10b981; }
+    .s-exceeded { background: rgba(52,211,153,.2);  color: #34d399; }
+
+    /* ── METRICS ─────────────────────────────────────── */
+    .met-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
+
+    .met-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: .875rem; padding: 1.25rem; text-align: center;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .met-card:hover { border-color: rgba(16,185,129,.3); transform: translateY(-2px); }
+
+    .met-std  { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--green); margin-bottom: .3rem; }
+    .met-val  { font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: .2rem; }
+    .met-unit { font-size: .7rem; color: var(--muted); margin-bottom: .15rem; }
+    .met-name { font-size: .75rem; color: var(--muted2); line-height: 1.3; }
+    .met-year { font-size: .65rem; color: var(--muted); margin-top: .2rem; }
+
+    /* ── DISCLOSURE EXPLORER ─────────────────────────── */
+    .filter-row { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+    .fbtn {
+      padding: .35rem 1rem; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted2); cursor: pointer; font-size: .82rem;
+      transition: all .15s;
+    }
+
+    .fbtn:hover, .fbtn.active { background: var(--green); border-color: var(--green); color: #fff; }
+
+    .disc-explorer { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+    .exp-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: .875rem; overflow: hidden; transition: border-color .2s;
+    }
+
+    .exp-card:hover { border-color: rgba(16,185,129,.3); }
+    .exp-card.present { border-left: 3px solid var(--green); }
+    .exp-card.absent  { border-left: 3px solid var(--red); }
+
+    .exp-header {
+      display: flex; align-items: center; gap: .875rem;
+      padding: .875rem 1.1rem; cursor: pointer; user-select: none;
+    }
+
+    .exp-code { font-size: .78rem; font-weight: 700; color: var(--green); min-width: 38px; }
+    .exp-code.absent { color: var(--red); }
+
+    .exp-info { flex: 1; }
+    .exp-title { font-size: .88rem; font-weight: 600; }
+    .exp-desc  { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+
+    .exp-meta { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
+
+    .present-badge {
+      font-size: .68rem; font-weight: 700;
+      padding: .15rem .5rem; border-radius: 999px;
+    }
+
+    .b-present { background: rgba(16,185,129,.14); color: var(--green); border: 1px solid rgba(16,185,129,.25); }
+    .b-absent  { background: rgba(239,68,68,.12);  color: var(--red);   border: 1px solid rgba(239,68,68,.2); }
+
+    .conf-mini { font-size: .65rem; color: var(--muted); }
+
+    .exp-body { display: none; padding: 0 1.1rem 1.1rem; border-top: 1px solid var(--border); }
+    .exp-body.open { display: block; }
+
+    .ev-label {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--muted); margin: .875rem 0 .4rem;
+    }
+
+    .ev-quote {
+      font-size: .78rem; color: var(--muted2); font-style: italic;
+      background: rgba(255,255,255,.025);
+      border-left: 2px solid var(--green);
+      padding: .45rem .7rem; border-radius: 0 .25rem .25rem 0;
+      margin-bottom: .4rem; line-height: 1.5;
+    }
+
+    .met-tr {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .35rem 0; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: .77rem;
+    }
+
+    .met-tr:last-child { border-bottom: none; }
+    .met-tr-name { color: var(--muted2); flex: 1; margin-right: 1rem; }
+    .met-tr-val  { font-weight: 700; color: var(--text); white-space: nowrap; }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--muted); font-size: .78rem;
+      border-top: 1px solid var(--border); margin-top: 2rem;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 900px) {
+      .ntp-grid { grid-template-columns: 1fr; }
+      .dim-grid { grid-template-columns: 1fr; }
+      .disc-explorer { grid-template-columns: 1fr; }
+      .score-hero { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .score-meta p { margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="pill" id="headerPill">CSRD · ESRS · Nature Transition Plan</div>
+  <h1 id="headerTitle">Loading…</h1>
+  <p class="subtitle" id="headerSubtitle"></p>
+
+  <div class="score-hero">
+    <div class="gauge-wrap">
+      <canvas id="gaugeChart" width="150" height="150"></canvas>
+      <div class="gauge-label">
+        <span class="num" id="gaugeNum">—</span>
+        <span class="den">/ 100</span>
+      </div>
+    </div>
+    <div class="score-meta">
+      <h2>Nature Transition Plan Score</h2>
+      <p>Overall assessment across 5 weighted dimensions covering foundations, metrics, implementation, engagement &amp; governance.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h2 class="sec-title"><span class="icon">🌿</span> NTP Scoring Dimensions</h2>
+    <div class="ntp-grid">
+      <div class="radar-card"><canvas id="radarChart"></canvas></div>
+      <div class="dim-grid" id="dimGrid"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title"><span class="icon">📋</span> ESRS Standards Coverage</h2>
+    <div class="standards-grid" id="stdGrid"></div>
+  </section>
+
+  <section id="targetsSec">
+    <h2 class="sec-title"><span class="icon">🎯</span> Progress Towards Targets</h2>
+    <div class="targets-grid" id="tgtGrid"></div>
+  </section>
+
+  <section>
+    <h2 class="sec-title"><span class="icon">📊</span> Key Environmental Metrics</h2>
+    <div class="met-grid" id="metGrid"></div>
+  </section>
+
+  <section>
+    <h2 class="sec-title"><span class="icon">🔍</span> Disclosure Explorer</h2>
+    <div class="filter-row" id="filterRow"></div>
+    <div class="disc-explorer" id="discExplorer"></div>
+  </section>
+</main>
+
+<footer id="footer"></footer>
+
+<!-- ── INJECTED DATA ───────────────────────────────────────────────── -->
+<script>
+const COMPANY      = "{{COMPANY}}";
+const REPORT_YEAR  = {{YEAR}};
+const TOTAL_SCORE  = {{TOTAL_SCORE}};
+const DISCLOSURES  = {{DISCLOSURES_JSON}};
+const NTP_DIMS     = {{NTP_DIMS_JSON}};
+const STANDARD_META = {{STANDARD_META_JSON}};
+</script>
+
+<!-- ── DASHBOARD LOGIC ────────────────────────────────────────────── -->
+<script>
+/* ── formatting ──────────────────────────────────────────────────── */
+function fmt(n) {
+  if (n === null || n === undefined) return "—";
+  if (Math.abs(n) >= 1e6)  return (n / 1e6).toFixed(2) + "M";
+  if (Math.abs(n) >= 1e3)  return (n / 1e3).toFixed(1) + "K";
+  if (!Number.isInteger(n)) return n.toFixed(1);
+  return n.toLocaleString();
+}
+
+function esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ── header ──────────────────────────────────────────────────────── */
+function renderHeader() {
+  const yearStr = REPORT_YEAR ? String(REPORT_YEAR) : "";
+  document.getElementById("headerPill").textContent =
+    `CSRD · ESRS · Nature Transition Plan · ${yearStr}`;
+  document.getElementById("headerTitle").textContent =
+    `${COMPANY} Environmental Disclosures`;
+  document.getElementById("headerSubtitle").textContent =
+    `Annual Report ${yearStr} · AI-assisted CSRD Compliance Analysis`;
+  document.getElementById("gaugeNum").textContent = TOTAL_SCORE;
+  document.getElementById("footer").textContent =
+    `Data source: ${COMPANY} Annual Report ${yearStr} · CSRD / ESRS Analysis · Generated with AI`;
+}
+
+/* ── gauge chart ─────────────────────────────────────────────────── */
+function renderGauge() {
+  const pct = Math.min(Math.max(TOTAL_SCORE, 0), 100);
+  new Chart(document.getElementById("gaugeChart").getContext("2d"), {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: [pct, 100 - pct],
+        backgroundColor: ["#10b981", "#1c3050"],
+        borderColor:     ["#10b981", "#1c3050"],
+        borderWidth: 0, hoverOffset: 0
+      }]
+    },
+    options: {
+      cutout: "76%", rotation: -130, circumference: 260,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { duration: 1200 }
+    }
+  });
+}
+
+/* ── radar chart ─────────────────────────────────────────────────── */
+function renderRadar() {
+  if (!NTP_DIMS.length) return;
+  new Chart(document.getElementById("radarChart").getContext("2d"), {
+    type: "radar",
+    data: {
+      labels: NTP_DIMS.map(d => d.label),
+      datasets: [
+        {
+          label: COMPANY + " Score",
+          data: NTP_DIMS.map(d => d.score),
+          backgroundColor: "rgba(16,185,129,.15)",
+          borderColor: "#10b981", borderWidth: 2,
+          pointBackgroundColor: "#10b981", pointBorderColor: "#0c1828", pointRadius: 5
+        },
+        {
+          label: "Max (3)",
+          data: NTP_DIMS.map(() => 3),
+          backgroundColor: "rgba(255,255,255,.03)",
+          borderColor: "rgba(255,255,255,.1)", borderWidth: 1, pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      scales: {
+        r: {
+          min: 0, max: 3,
+          ticks: { stepSize: 1, color: "#64748b", font: { size: 9 }, backdropColor: "transparent" },
+          grid: { color: "rgba(255,255,255,.07)" },
+          angleLines: { color: "rgba(255,255,255,.06)" },
+          pointLabels: { color: "#94a3b8", font: { size: 10, weight: "600" } }
+        }
+      },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { duration: 1000 }
+    }
+  });
+}
+
+/* ── dimension cards ─────────────────────────────────────────────── */
+function renderDimCards() {
+  const el = document.getElementById("dimGrid");
+  if (!NTP_DIMS.length) { el.innerHTML = '<p class="empty-state">No NTP scoring data found.</p>'; return; }
+
+  el.innerHTML = NTP_DIMS.map(d => {
+    const mClass = ["Credible","Coherent","Aware"].includes(d.maturity)
+      ? `m-${d.maturity}` : "m-default";
+    return `
+      <div class="dim-card">
+        <div class="dim-top">
+          <div class="dim-name">${esc(d.label)}</div>
+          <div class="dim-score">${d.score}<sub> / 3</sub></div>
+        </div>
+        <div class="maturity-badge ${mClass}">${esc(d.maturity || "—")}</div>
+        <p class="dim-rationale">${esc(d.rationale)}</p>
+        <div class="dim-weight-bar">
+          <div class="dw-track"><div class="dw-fill" style="width:${d.weight * 2}%"></div></div>
+          <span class="dw-label">Weight: ${d.weight}%</span>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ── standards grid ──────────────────────────────────────────────── */
+function renderStandards() {
+  const el = document.getElementById("stdGrid");
+  const codes = Object.keys(STANDARD_META).sort();
+
+  if (!codes.length) { el.innerHTML = '<p class="empty-state">No standard data found.</p>'; return; }
+
+  el.innerHTML = codes.map(code => {
+    const meta  = STANDARD_META[code];
+    const discs = DISCLOSURES.filter(d => d.standard === code);
+    const present = discs.filter(d => d.is_present).length;
+    const color = present === discs.length ? "var(--green)" : present > 0 ? "var(--amber)" : "var(--red)";
+
+    return `
+      <div class="std-card">
+        <div class="std-header">
+          <div>
+            <div class="std-code">${esc(meta.emoji)} ${esc(code)}</div>
+            <div class="std-name">${esc(meta.name)}</div>
+          </div>
+          <div class="std-coverage">
+            <div class="num" style="color:${color}">${present}</div>
+            <div class="den">/ ${discs.length} disclosed</div>
+          </div>
+        </div>
+        <div class="disc-rows">
+          ${discs.map(d => `
+            <div class="disc-row" onclick="scrollToDisc('${esc(d.code)}')">
+              <div class="dot ${d.is_present ? 'dot-present' : 'dot-absent'}"></div>
+              <div class="disc-code">${esc(d.code)}</div>
+              <div class="disc-title">${esc(d.title)}</div>
+              <div class="conf-bar"><div class="conf-fill" style="width:${(d.confidence ?? 0) * 100}%"></div></div>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ── target detection ────────────────────────────────────────────── */
+function findTargetTriplets() {
+  const triplets = [];
+  const reportYear = REPORT_YEAR || new Date().getFullYear();
+
+  DISCLOSURES.forEach(disc => {
+    const dated = (disc.metrics || []).filter(m => m.year !== null && m.year !== undefined);
+    if (dated.length < 2) return;
+
+    const years = [...new Set(dated.map(m => m.year))].sort((a, b) => a - b);
+    const futureYears = years.filter(y => y > reportYear);
+    const pastYears   = years.filter(y => y <= reportYear);
+
+    if (!futureYears.length || !pastYears.length) return;
+
+    const targetYear = futureYears[futureYears.length - 1];
+    const baseYear   = pastYears[0];
+    const actualYear = pastYears.includes(reportYear) ? reportYear : pastYears[pastYears.length - 1];
+
+    if (baseYear === actualYear) return;
+
+    const targetMetric = dated.find(m => m.year === targetYear && /target/i.test(m.name))
+                      || dated.find(m => m.year === targetYear);
+    const baseMetric   = dated.find(m => m.year === baseYear && /baseline/i.test(m.name))
+                      || dated.find(m => m.year === baseYear);
+    const actualMetric = dated.find(m => m.year === actualYear && !/target|baseline/i.test(m.name))
+                      || dated.find(m => m.year === actualYear);
+
+    if (!targetMetric || !baseMetric || !actualMetric) return;
+
+    const isReduction = baseMetric.value > targetMetric.value;
+    let progress;
+    if (isReduction) {
+      const totalGap    = baseMetric.value - targetMetric.value;
+      const achievedGap = baseMetric.value - actualMetric.value;
+      progress = totalGap > 0 ? Math.round((achievedGap / totalGap) * 100) : 0;
+    } else {
+      const totalGap    = targetMetric.value - baseMetric.value;
+      const achievedGap = actualMetric.value - baseMetric.value;
+      progress = totalGap > 0 ? Math.round((achievedGap / totalGap) * 100) : 0;
+    }
+
+    const pctVsBase = baseMetric.value !== 0
+      ? ((actualMetric.value - baseMetric.value) / baseMetric.value * 100).toFixed(1)
+      : null;
+
+    triplets.push({
+      code: disc.code, title: disc.title, standard: disc.standard,
+      baseline: { value: baseMetric.value, year: baseYear, unit: baseMetric.unit },
+      actual:   { value: actualMetric.value, year: actualYear, unit: actualMetric.unit },
+      target:   { value: targetMetric.value, year: targetYear, unit: targetMetric.unit },
+      progress: Math.min(Math.max(progress, 0), 110),
+      exceeded:  progress >= 100,
+      pctVsBase: pctVsBase !== null ? (pctVsBase > 0 ? "+" : "") + pctVsBase + "%" : null,
+      isReduction
+    });
+  });
+
+  return triplets;
+}
+
+/* ── targets section ─────────────────────────────────────────────── */
+function renderTargets() {
+  const el = document.getElementById("tgtGrid");
+  const triplets = findTargetTriplets();
+
+  if (!triplets.length) {
+    document.getElementById("targetsSec").style.display = "none";
+    return;
+  }
+
+  el.innerHTML = triplets.map(t => {
+    const pct       = Math.min(t.progress, 100);
+    const fillClass = t.exceeded ? "prog-exceeded" : "prog-green";
+    const tagClass  = t.exceeded ? "s-exceeded" : "s-ontrack";
+    const tagLabel  = t.exceeded ? "✅ Target Exceeded" : "⏳ On Track";
+    const deltaStr  = t.pctVsBase
+      ? `<div class="tgt-delta">${t.pctVsBase} vs ${t.baseline.year}</div>`
+      : "";
+
+    return `
+      <div class="tgt-card">
+        <div class="tgt-standard">${esc(t.standard)} · ${esc(t.code)}</div>
+        <div class="tgt-label">${esc(t.title)}</div>
+        <div class="tgt-current">${fmt(t.actual.value)} <small>${esc(t.actual.unit)}</small></div>
+        ${deltaStr}
+        <div class="tgt-year-labels">
+          <span>${t.baseline.year}</span>
+          <span>${t.actual.year}</span>
+          <span>${t.target.year} target</span>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill ${fillClass}" data-width="${pct}" style="width:0"></div>
+        </div>
+        <div class="tgt-edge-labels">
+          <span>${fmt(t.baseline.value)}</span>
+          <span>${fmt(t.actual.value)}</span>
+          <span>${fmt(t.target.value)}</span>
+        </div>
+        <span class="status-tag ${tagClass}">${tagLabel} (${pct}% complete)</span>
+      </div>`;
+  }).join("");
+
+  setTimeout(() => {
+    document.querySelectorAll(".prog-fill[data-width]").forEach(el => {
+      el.style.width = el.dataset.width + "%";
+    });
+  }, 300);
+}
+
+/* ── key metrics ─────────────────────────────────────────────────── */
+function renderMetrics() {
+  const el = document.getElementById("metGrid");
+
+  // Collect all metrics, deduplicate by name (last value wins)
+  const seen = new Map();
+  DISCLOSURES.forEach(d => {
+    (d.metrics || []).forEach(m => {
+      seen.set(m.name, { ...m, standard: d.standard });
+    });
+  });
+
+  const all = [...seen.values()];
+
+  if (!all.length) { el.innerHTML = '<p class="empty-state">No quantitative metrics found.</p>'; return; }
+
+  el.innerHTML = all.map(m => `
+    <div class="met-card">
+      <div class="met-std">${esc(m.standard)}</div>
+      <div class="met-val">${fmt(m.value)}</div>
+      <div class="met-unit">${esc(m.unit)}</div>
+      <div class="met-name">${esc(m.name)}</div>
+      ${m.year ? `<div class="met-year">${m.year}</div>` : ""}
+    </div>`).join("");
+}
+
+/* ── disclosure explorer ─────────────────────────────────────────── */
+let activeFilter = "All";
+
+function renderFilterBtns() {
+  const codes    = Object.keys(STANDARD_META).sort();
+  const filters  = ["All", ...codes, "Present", "Absent"];
+  document.getElementById("filterRow").innerHTML = filters.map(f => `
+    <button class="fbtn ${f === activeFilter ? "active" : ""}" onclick="setFilter('${f}')">${f}</button>
+  `).join("");
+}
+
+function setFilter(f) { activeFilter = f; renderFilterBtns(); renderDisclosures(); }
+
+function renderDisclosures() {
+  let list = DISCLOSURES;
+  if (["Present", "Absent"].includes(activeFilter)) {
+    list = list.filter(d => activeFilter === "Present" ? d.is_present : !d.is_present);
+  } else if (activeFilter !== "All") {
+    list = list.filter(d => d.standard === activeFilter);
+  }
+
+  const el = document.getElementById("discExplorer");
+
+  if (!list.length) {
+    el.innerHTML = '<p class="empty-state" style="grid-column:1/-1">No disclosures match this filter.</p>';
+    return;
+  }
+
+  el.innerHTML = list.map(d => {
+    const hasBody = (d.evidence?.length || d.metrics?.length);
+    return `
+      <div class="exp-card ${d.is_present ? "present" : "absent"}" id="disc-${esc(d.code)}">
+        <div class="exp-header" ${hasBody ? `onclick="toggleDisc(this)"` : ""}>
+          <div class="exp-code ${d.is_present ? "" : "absent"}">${esc(d.code)}</div>
+          <div class="exp-info">
+            <div class="exp-title">${esc(d.title)}</div>
+            <div class="exp-desc">${esc(d.description)}</div>
+          </div>
+          <div class="exp-meta">
+            <span class="present-badge ${d.is_present ? "b-present" : "b-absent"}">
+              ${d.is_present ? "Present" : "Not Present"}
+            </span>
+            ${d.confidence != null
+              ? `<span class="conf-mini">Confidence: ${Math.round(d.confidence * 100)}%</span>`
+              : ""}
+          </div>
+        </div>
+        ${hasBody ? `
+        <div class="exp-body">
+          ${d.evidence?.length ? `
+            <div class="ev-label">Evidence</div>
+            ${d.evidence.map(e => `<div class="ev-quote">${esc(e.quote ?? e)}</div>`).join("")}
+          ` : ""}
+          ${d.metrics?.length ? `
+            <div class="ev-label">Metrics</div>
+            ${d.metrics.map(m => `
+              <div class="met-tr">
+                <span class="met-tr-name">${esc(m.name)}</span>
+                <span class="met-tr-val">${m.value != null ? m.value.toLocaleString() : "—"} ${esc(m.unit)}${m.year ? " (" + m.year + ")" : ""}</span>
+              </div>`).join("")}
+          ` : ""}
+        </div>` : ""}
+      </div>`;
+  }).join("");
+}
+
+function toggleDisc(header) {
+  const body = header.nextElementSibling;
+  if (body) body.classList.toggle("open");
+}
+
+function scrollToDisc(code) {
+  const std = code.slice(0, 2);
+  if (STANDARD_META[std]) setFilter(std); else setFilter("All");
+  setTimeout(() => {
+    const el = document.getElementById("disc-" + code);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    const body = el.querySelector(".exp-body");
+    if (body) body.classList.add("open");
+  }, 50);
+}
+
+/* ── init ────────────────────────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+  renderHeader();
+  renderGauge();
+  renderRadar();
+  renderDimCards();
+  renderStandards();
+  renderTargets();
+  renderMetrics();
+  renderFilterBtns();
+  renderDisclosures();
+});
+</script>
+</body>
+</html>
