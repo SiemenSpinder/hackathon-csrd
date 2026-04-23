@@ -7,6 +7,10 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 \usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{enumitem}
+
 % ── colour palette ──────────────────────────────────────────────
 \definecolor{wwfgreen}{RGB}{0,100,60}
 \definecolor{lightgray}{RGB}{245,245,245}
@@ -15,6 +19,13 @@
 \setbeamercolor{title}{bg=wwfgreen,fg=white}
 \setbeamercolor{structure}{fg=wwfgreen}
 \setbeamercolor{block title}{bg=wwfgreen,fg=white}
+
+% Tighten default list spacing to reduce overflow
+\setlist[itemize]{itemsep=3pt, topsep=2pt, parsep=0pt, partopsep=0pt}
+
+% Slightly tighter math spacing
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
 
 % ── code style ──────────────────────────────────────────────────
 \lstset{
@@ -84,11 +95,12 @@
 
 \begin{frame}{Pipeline Architecture}
   \centering
+  \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[
-      node distance=0.7cm and 1.0cm,
+      node distance=0.5cm and 0.8cm,
       box/.style={rectangle, rounded corners=4pt, draw=wwfgreen, fill=wwfgreen!10,
-                  text width=2.4cm, align=center, minimum height=0.9cm, font=\small},
-      arrow/.style={-{Stealth[length=6pt]}, thick, color=wwfgreen},
+                  text width=2.0cm, align=center, minimum height=0.7cm, font=\footnotesize},
+      arrow/.style={-{Stealth[length=5pt]}, thick, color=wwfgreen},
     ]
 
     \node[box] (input) {Annual Report\\(Markdown)};
@@ -104,11 +116,8 @@
     \draw[arrow] (merge) -- (enrich);
     \draw[arrow] (enrich) -- (output);
 
-    \node[below=0.3cm of clean, font=\tiny, text=gray, align=center] {$\sim$4 chars/token\\overlap: 200 tok};
-    \node[below=0.3cm of llm, font=\tiny, text=gray, align=center] {\texttt{beta.chat.completions}\\\texttt{.parse()}};
-    \node[below=0.3cm of merge, font=\tiny, text=gray, align=center] {max confidence\\max NTP score};
-    \node[below=0.3cm of enrich, font=\tiny, text=gray, align=center] {ontology + weights\\total /100};
   \end{tikzpicture}
+  }%
 
   \vspace{8pt}
   \begin{columns}
@@ -131,7 +140,7 @@
 \section{Technical Stack}
 % ================================================================
 
-\begin{frame}[fragile]{Technical Stack}
+\begin{frame}[fragile,shrink=10]{Technical Stack}
   \begin{columns}
     \column{0.5\textwidth}
       \begin{block}{Runtime}
@@ -175,6 +184,7 @@ TIMEOUT_MS=600000
 % ================================================================
 
 \begin{frame}{ESRS Disclosure Extraction --- Scope}
+  \footnotesize
   The system extracts \textbf{22 disclosure codes} across four ESRS nature standards:
 
   \vspace{4pt}
@@ -218,6 +228,7 @@ TIMEOUT_MS=600000
 
   \vspace{8pt}
   \begin{block}{Per-disclosure output fields}
+    \scriptsize
     \texttt{code} $\cdot$ \texttt{is\_present} (bool) $\cdot$ \texttt{confidence} [0--1] $\cdot$
     \texttt{evidence[]\{quote\}} (verbatim, $\leq$280 chars) $\cdot$
     \texttt{metrics[]\{name, value, unit, year\}}
@@ -229,11 +240,13 @@ TIMEOUT_MS=600000
 % ================================================================
 
 \begin{frame}{Nature Transition Plan (NTP) Scoring}
+  \scriptsize
   Based on the \textbf{WWF NAT40 methodology} (Feb 2026) applied to CAC 40 companies.
   Five components scored on a \textbf{4-level maturity scale}:
 
   \vspace{6pt}
-  \begin{tabular}{clp{8cm}}
+  % Levels table scaled to width using tabularx
+  \begin{tabularx}{\textwidth}{c l X}
     \toprule
     \textbf{Level} & \textbf{Label} & \textbf{Meaning} \\
     \midrule
@@ -242,13 +255,13 @@ TIMEOUT_MS=600000
     2 & Coherent     & Exceeds minimum; integrates WWF/EFRAG expectations \\
     3 & Credible     & Advanced maturity; science-based frameworks (SBTN, TNFD) \\
     \bottomrule
-  \end{tabular}
+  \end{tabularx}
 
   \vspace{8pt}
   \begin{columns}
     \column{0.55\textwidth}
       \textbf{Weighted total score /100:}\\[4pt]
-      \begin{tabular}{lcc}
+      \begin{tabularx}{\columnwidth}{l c c}
         \toprule
         Dimension & Weight & Max pts \\
         \midrule
@@ -260,7 +273,7 @@ TIMEOUT_MS=600000
         \midrule
         \textbf{Total}          & 100\% & 100 \\
         \bottomrule
-      \end{tabular}
+      \end{tabularx}
     \column{0.42\textwidth}
       \begin{block}{Formula}
         \[
@@ -274,9 +287,9 @@ TIMEOUT_MS=600000
   \end{columns}
 \end{frame}
 
-\begin{frame}{NTP Dimensions --- Scoring Criteria}
-  \footnotesize
-  \begin{tabular}{p{2.8cm}p{4.4cm}p{4.4cm}}
+\begin{frame}[shrink=5]{NTP Dimensions --- Scoring Criteria}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{p{2.9cm} X X}
     \toprule
     \textbf{Dimension} & \textbf{Score 1--2 (Compliant/Coherent)} & \textbf{Score 3 (Credible)} \\
     \midrule
@@ -300,14 +313,14 @@ TIMEOUT_MS=600000
       & Board oversight documented; senior owner identified; nature in key functions
       & Nature KPIs in executive variable remuneration; formal training programmes for board \& employees \\
     \bottomrule
-  \end{tabular}
+  \end{tabularx}
 \end{frame}
 
 % ================================================================
 \section{Output Format}
 % ================================================================
 
-\begin{frame}[fragile]{Output Format}
+\begin{frame}[fragile,shrink=10]{Output Format}
   The pipeline writes \texttt{data/output.json} with the following structure:
   \begin{lstlisting}[language=Python]
 {
@@ -339,7 +352,7 @@ TIMEOUT_MS=600000
 \section{Data Models}
 % ================================================================
 
-\begin{frame}[fragile]{Pydantic Data Models}
+\begin{frame}[fragile,shrink=10]{Pydantic Data Models}
   \begin{columns}
     \column{0.48\textwidth}
       \begin{lstlisting}[language=Python, title=Disclosure models]
@@ -389,7 +402,7 @@ class CombinedExtractionResult(BaseModel):
 \section{Source Layout}
 % ================================================================
 
-\begin{frame}[fragile]{Project Source Layout}
+\begin{frame}[fragile,shrink=5]{Project Source Layout}
   \begin{columns}
     \column{0.45\textwidth}
       \begin{block}{Key files}
