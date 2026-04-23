@@ -1,0 +1,459 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usepackage{xcolor}
+% ── colour palette ──────────────────────────────────────────────
+\definecolor{wwfgreen}{RGB}{0,100,60}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{codeteal}{RGB}{0,128,128}
+\setbeamercolor{frametitle}{bg=wwfgreen,fg=white}
+\setbeamercolor{title}{bg=wwfgreen,fg=white}
+\setbeamercolor{structure}{fg=wwfgreen}
+\setbeamercolor{block title}{bg=wwfgreen,fg=white}
+
+% ── code style ──────────────────────────────────────────────────
+\lstset{
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{codeteal}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{orange!80!black},
+  backgroundcolor=\color{lightgray},
+  frame=single,
+  framerule=0pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  breaklines=true,
+  showstringspaces=false,
+}
+
+% ── title metadata ───────────────────────────────────────────────
+\title[CSRD Nature Scoring]{CSRD Nature Transition Plan Scorer}
+\subtitle{Automated ESRS E2--E5 Disclosure Extraction \& NTP Scoring}
+\author{Hackathon CSRD Team}
+\date{\today}
+\institute{Powered by Azure OpenAI $\cdot$ WWF NAT40 Framework}
+
+% ─────────────────────────────────────────────────────────────────
+\begin{document}
+% ─────────────────────────────────────────────────────────────────
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}{Table of Contents}
+  \tableofcontents
+\end{frame}
+
+% ================================================================
+\section{Overview}
+% ================================================================
+
+\begin{frame}{What does the system do?}
+  \begin{columns}
+    \column{0.55\textwidth}
+      \textbf{Input}\\[4pt]
+      An annual report (CSRD / Universal Registration Document) in Markdown format.
+
+      \vspace{10pt}
+      \textbf{Output (JSON)}
+      \begin{itemize}
+        \item 22 structured ESRS E2--E5 disclosure extractions with evidence \& metrics
+        \item 5-dimension Nature Transition Plan (NTP) score modelled on the \textbf{WWF NAT40 framework}
+        \item Weighted total score \textbf{out of 100}
+      \end{itemize}
+
+    \column{0.4\textwidth}
+      \begin{block}{Why it matters}
+        CSRD mandates disclosure of nature-related impacts (ESRS E2--E5). The WWF NAT40 study
+        shows that only 1 in 40 French large-caps currently meets the average on Nature
+        Transition Plans. This tool makes scoring fast, repeatable, and auditable.
+      \end{block}
+  \end{columns}
+\end{frame}
+
+% ================================================================
+\section{Architecture}
+% ================================================================
+
+\begin{frame}{Pipeline Architecture}
+  \centering
+  \begin{tikzpicture}[
+      node distance=0.7cm and 1.0cm,
+      box/.style={rectangle, rounded corners=4pt, draw=wwfgreen, fill=wwfgreen!10,
+                  text width=2.4cm, align=center, minimum height=0.9cm, font=\small},
+      arrow/.style={-{Stealth[length=6pt]}, thick, color=wwfgreen},
+    ]
+
+    \node[box] (input) {Annual Report\\(Markdown)};
+    \node[box, right=of input] (clean) {Clean \&\\Chunk Text};
+    \node[box, right=of clean] (llm) {Azure OpenAI\\(Structured Output)};
+    \node[box, right=of llm] (merge) {Merge\\Chunks};
+    \node[box, right=of merge] (enrich) {Enrich \&\\Score};
+    \node[box, right=of enrich] (output) {output.json};
+
+    \draw[arrow] (input) -- (clean);
+    \draw[arrow] (clean) -- (llm);
+    \draw[arrow] (llm) -- (merge);
+    \draw[arrow] (merge) -- (enrich);
+    \draw[arrow] (enrich) -- (output);
+
+    \node[below=0.3cm of clean, font=\tiny, text=gray, align=center] {$\sim$4 chars/token\\overlap: 200 tok};
+    \node[below=0.3cm of llm, font=\tiny, text=gray, align=center] {\texttt{beta.chat.completions}\\\texttt{.parse()}};
+    \node[below=0.3cm of merge, font=\tiny, text=gray, align=center] {max confidence\\max NTP score};
+    \node[below=0.3cm of enrich, font=\tiny, text=gray, align=center] {ontology + weights\\total /100};
+  \end{tikzpicture}
+
+  \vspace{8pt}
+  \begin{columns}
+    \column{0.33\textwidth}
+      \textbf{Chunking strategy}\\
+      Documents $>$100k tokens are split into overlapping chunks of 100k tokens
+      with a 200-token overlap to avoid cutting mid-sentence.
+    \column{0.33\textwidth}
+      \textbf{Single LLM call per chunk}\\
+      One \texttt{parse()} call returns \emph{both} ESRS disclosures and NTP scores,
+      keeping latency and cost minimal.
+    \column{0.33\textwidth}
+      \textbf{Merge strategy}\\
+      Disclosures: OR on \texttt{is\_present}, MAX on confidence, union of evidence/metrics.
+      NTP scores: MAX per dimension across chunks.
+  \end{columns}
+\end{frame}
+
+% ================================================================
+\section{Technical Stack}
+% ================================================================
+
+\begin{frame}[fragile]{Technical Stack}
+  \begin{columns}
+    \column{0.5\textwidth}
+      \begin{block}{Runtime}
+        \begin{itemize}
+          \item Python 3.12
+          \item \texttt{openai} SDK --- \texttt{AzureOpenAI} client
+          \item \texttt{pydantic} v2 --- schema validation \& structured output
+          \item \texttt{python-dotenv} --- environment configuration
+        \end{itemize}
+      \end{block}
+      \vspace{6pt}
+      \begin{block}{LLM}
+        \begin{itemize}
+          \item Model: \texttt{gpt-5-mini} (Azure deployment)
+          \item Endpoint: \texttt{acm-openai-tdasc-prd.openai.azure.com}
+          \item API version: \texttt{2024-12-01-preview}
+          \item Structured output via \texttt{beta.chat.completions.parse()}
+          \item Timeout: 600 s (configurable via \texttt{TIMEOUT\_MS})
+        \end{itemize}
+      \end{block}
+    \column{0.46\textwidth}
+      \begin{block}{Key configuration (\texttt{.env})}
+        \begin{lstlisting}[language=bash]
+AZURE_OPENAI_API_KEY=<key>
+AZURE_OPENAI_ENDPOINT=https://...
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
+MODEL=gpt-5-mini
+DATA_FOLDER=data
+# Optional overrides:
+MAX_TOTAL_TOKENS=100000
+CHUNK_TOKENS=100000
+MAX_GENERATION_TOKENS=20000
+TIMEOUT_MS=600000
+        \end{lstlisting}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+% ================================================================
+\section{ESRS E2--E5 Extraction}
+% ================================================================
+
+\begin{frame}{ESRS Disclosure Extraction --- Scope}
+  The system extracts \textbf{22 disclosure codes} across four ESRS nature standards:
+
+  \vspace{4pt}
+  \begin{columns}
+    \column{0.24\textwidth}
+      \textcolor{wwfgreen}{\textbf{E2 --- Pollution}}\\[3pt]
+      \footnotesize
+      E2-1 Policies\\
+      E2-2 Actions\\
+      E2-3 Targets\\
+      E2-4 Air/Water/Soil\\
+      E2-5 Substances\\
+      E2-6 Financial effects
+    \column{0.24\textwidth}
+      \textcolor{wwfgreen}{\textbf{E3 --- Water}}\\[3pt]
+      \footnotesize
+      E3-1 Policies\\
+      E3-2 Actions\\
+      E3-3 Targets\\
+      E3-4 Withdrawal\\
+      E3-5 Financial effects
+    \column{0.24\textwidth}
+      \textcolor{wwfgreen}{\textbf{E4 --- Biodiversity}}\\[3pt]
+      \footnotesize
+      E4-1 Transition plan\\
+      E4-2 Policies\\
+      E4-3 Actions\\
+      E4-4 Targets\\
+      E4-5 Metrics\\
+      E4-6 Financial effects
+    \column{0.24\textwidth}
+      \textcolor{wwfgreen}{\textbf{E5 --- Resources}}\\[3pt]
+      \footnotesize
+      E5-1 Policies\\
+      E5-2 Actions\\
+      E5-3 Targets\\
+      E5-4 Inflows\\
+      E5-5 Waste\\
+      E5-6 Financial effects
+  \end{columns}
+
+  \vspace{8pt}
+  \begin{block}{Per-disclosure output fields}
+    \texttt{code} $\cdot$ \texttt{is\_present} (bool) $\cdot$ \texttt{confidence} [0--1] $\cdot$
+    \texttt{evidence[]\{quote\}} (verbatim, $\leq$280 chars) $\cdot$
+    \texttt{metrics[]\{name, value, unit, year\}}
+  \end{block}
+\end{frame}
+
+% ================================================================
+\section{NTP Scoring --- WWF NAT40 Framework}
+% ================================================================
+
+\begin{frame}{Nature Transition Plan (NTP) Scoring}
+  Based on the \textbf{WWF NAT40 methodology} (Feb 2026) applied to CAC 40 companies.
+  Five components scored on a \textbf{4-level maturity scale}:
+
+  \vspace{6pt}
+  \begin{tabular}{clp{8cm}}
+    \toprule
+    \textbf{Level} & \textbf{Label} & \textbf{Meaning} \\
+    \midrule
+    0 & Non-aligned  & Absent or problematic disclosure \\
+    1 & Compliant    & Meets minimum CSRD/ESRS transparency requirements \\
+    2 & Coherent     & Exceeds minimum; integrates WWF/EFRAG expectations \\
+    3 & Credible     & Advanced maturity; science-based frameworks (SBTN, TNFD) \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{8pt}
+  \begin{columns}
+    \column{0.55\textwidth}
+      \textbf{Weighted total score /100:}\\[4pt]
+      \begin{tabular}{lcc}
+        \toprule
+        Dimension & Weight & Max pts \\
+        \midrule
+        Foundations             & 25\% & 25 \\
+        Metrics \& Targets      & 20\% & 20 \\
+        Implementation Strategy & 30\% & 30 \\
+        Engagement Strategy     & 15\% & 15 \\
+        Governance              & 10\% & 10 \\
+        \midrule
+        \textbf{Total}          & 100\% & 100 \\
+        \bottomrule
+      \end{tabular}
+    \column{0.42\textwidth}
+      \begin{block}{Formula}
+        \[
+          \text{Score} = \sum_{d} \frac{s_d}{3} \times w_d
+        \]
+        where $s_d \in \{0,1,2,3\}$ and $w_d$ is the dimension weight (in points).
+      \end{block}
+      \vspace{4pt}
+      \footnotesize Implementation Strategy carries the \textbf{highest weight} to
+      prioritise operational practices over disclosure alone (per WWF NAT40 design).
+  \end{columns}
+\end{frame}
+
+\begin{frame}{NTP Dimensions --- Scoring Criteria}
+  \footnotesize
+  \begin{tabular}{p{2.8cm}p{4.4cm}p{4.4cm}}
+    \toprule
+    \textbf{Dimension} & \textbf{Score 1--2 (Compliant/Coherent)} & \textbf{Score 3 (Credible)} \\
+    \midrule
+    \textbf{Foundations}
+      & Double materiality covers direct ops; TNFD or SRTN methodology referenced
+      & Multi-scale analysis (local/regional/global); IPBES pressure categories; KBAs mapped; aligned with Kunming-Montreal \\
+    \addlinespace
+    \textbf{Metrics \& Targets}
+      & ESRS E2--E5 indicators for direct ops; targets with time horizons
+      & Science-based targets (SBTN-aligned) or contextual/territorial targets linked to state-of-nature indicators \\
+    \addlinespace
+    \textbf{Implementation Strategy}
+      & Action plans exist; linked to material impacts; some financial commitments
+      & Site/supply-chain-specific plans; mitigation hierarchy (AR3T); formal financing plan (CAPEX/OPEX) \\
+    \addlinespace
+    \textbf{Engagement Strategy}
+      & Named stakeholder groups; described mechanisms
+      & Indigenous \& local community guarantees; lobbying positions disclosed \& aligned with nature commitments \\
+    \addlinespace
+    \textbf{Governance}
+      & Board oversight documented; senior owner identified; nature in key functions
+      & Nature KPIs in executive variable remuneration; formal training programmes for board \& employees \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+% ================================================================
+\section{Output Format}
+% ================================================================
+
+\begin{frame}[fragile]{Output Format}
+  The pipeline writes \texttt{data/output.json} with the following structure:
+  \begin{lstlisting}[language=Python]
+{
+  "rick_output_Airbus_2024.json": {
+    "disclosures": [
+      {
+        "code": "E4-2",  "title": "Biodiversity policies",  "standard": "E4",
+        "is_present": true,  "confidence": 0.82,
+        "evidence": [{"quote": "Our no-net-loss policy applies to all owned sites..."}],
+        "metrics": [{"name": "Sites in KBAs", "value": 3, "unit": "count", "year": 2024}]
+      },
+      ...  // 22 codes total
+    ],
+    "ntp_scoring": {
+      "foundations":             {"score": 2, "maturity": "Coherent", "weight": 25,
+                                  "weighted_contribution": 16.7, "rationale": "...", "evidence": [...]},
+      "metrics_and_targets":     {"score": 1, "maturity": "Compliant", "weight": 20, ...},
+      "implementation_strategy": {"score": 2, "maturity": "Coherent",  "weight": 30, ...},
+      "engagement_strategy":     {"score": 1, "maturity": "Compliant", "weight": 15, ...},
+      "governance":              {"score": 2, "maturity": "Coherent",  "weight": 10, ...},
+      "total_score": 55.0
+    }
+  }
+}
+  \end{lstlisting}
+\end{frame}
+
+% ================================================================
+\section{Data Models}
+% ================================================================
+
+\begin{frame}[fragile]{Pydantic Data Models}
+  \begin{columns}
+    \column{0.48\textwidth}
+      \begin{lstlisting}[language=Python, title=Disclosure models]
+class Evidence(BaseModel):
+    quote: str
+
+class MetricValue(BaseModel):
+    name: str
+    value: float
+    unit: str
+    year: Optional[int]
+
+class DisclosureExtraction(BaseModel):
+    code: ESRSCode        # E2-1 .. E5-6
+    is_present: bool
+    confidence: float     # [0,1]
+    evidence: List[Evidence]
+    metrics: List[MetricValue]
+      \end{lstlisting}
+    \column{0.48\textwidth}
+      \begin{lstlisting}[language=Python, title=NTP scoring models]
+class NTPDimensionScore(BaseModel):
+    score: int   # 0-3
+    rationale: str
+    evidence: List[Evidence]
+
+class NTPScoringResult(BaseModel):
+    foundations: NTPDimensionScore
+    metrics_and_targets: NTPDimensionScore
+    implementation_strategy: NTPDimensionScore
+    engagement_strategy: NTPDimensionScore
+    governance: NTPDimensionScore
+
+class CombinedExtractionResult(BaseModel):
+    disclosures: List[DisclosureExtraction]
+    ntp_scoring: NTPScoringResult
+      \end{lstlisting}
+  \end{columns}
+  \vspace{4pt}
+  \centering
+  \footnotesize
+  \texttt{CombinedExtractionResult} is passed directly as \texttt{response\_format}
+  to \texttt{client.beta.chat.completions.parse()}, enforcing strict JSON output.
+\end{frame}
+
+% ================================================================
+\section{Source Layout}
+% ================================================================
+
+\begin{frame}[fragile]{Project Source Layout}
+  \begin{columns}
+    \column{0.45\textwidth}
+      \begin{block}{Key files}
+        \footnotesize
+        \begin{tabular}{ll}
+          \texttt{main.py}                  & Entry point \\
+          \texttt{src/config.py}            & \texttt{load\_config()} \\
+          \texttt{src/pipeline.py}          & \texttt{run\_pipeline()} \\
+          \texttt{src/models.py}            & Pydantic schemas \\
+          \texttt{src/prompts.py}           & System prompt \\
+          \texttt{src/esrs\_ontology.py}    & Code lookup + enrichment \\
+          \texttt{src/utils/text.py}        & Chunking / tokenisation \\
+          \texttt{src/utils/merge.py}       & Multi-chunk merging \\
+          \texttt{data/input.md}            & Input annual report \\
+          \texttt{data/output.json}         & Output \\
+        \end{tabular}
+      \end{block}
+    \column{0.5\textwidth}
+      \begin{block}{Running the pipeline}
+        \begin{lstlisting}[language=bash]
+# Install dependencies
+pip install -r requirements.txt
+
+# Run (reads .env automatically)
+python main.py
+
+# Override model or chunk size:
+MODEL=gpt-4o \
+CHUNK_TOKENS=80000 \
+python main.py
+        \end{lstlisting}
+      \end{block}
+      \vspace{4pt}
+      \begin{alertblock}{Tip}
+        \footnotesize Set \texttt{DATA\_FOLDER} in \texttt{.env} to point to any directory
+        containing an \texttt{input.md} file.
+      \end{alertblock}
+  \end{columns}
+\end{frame}
+
+% ================================================================
+\begin{frame}{Summary}
+  \begin{columns}
+    \column{0.55\textwidth}
+      \begin{itemize}
+        \setlength\itemsep{6pt}
+        \item[\checkmark] Reads any CSRD annual report in Markdown
+        \item[\checkmark] Chunks large documents with overlap to stay within context
+        \item[\checkmark] Single LLM call per chunk extracts \emph{both} ESRS disclosures
+              and NTP scores
+        \item[\checkmark] 22 ESRS E2--E5 disclosure codes with evidence \& metrics
+        \item[\checkmark] 5-dimension NTP score (0--3) aligned with \textbf{WWF NAT40}
+        \item[\checkmark] Weighted total out of 100 with maturity labels
+        \item[\checkmark] Fully configurable via environment variables
+      \end{itemize}
+    \column{0.4\textwidth}
+      \begin{block}{Reference}
+        WWF France (2026).\\
+        \textit{The NAT40 Index: CAC 40 Companies Put to the Test by Nature.}\\[6pt]
+        ESRS E2--E5, EFRAG (2023).\\[6pt]
+        SBTN, TNFD frameworks.
+      \end{block}
+  \end{columns}
+\end{frame}
+% ================================================================
+
+\end{document}
