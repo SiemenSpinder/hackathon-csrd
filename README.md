@@ -2,6 +2,10 @@
 
 A pipeline that analyzes corporate annual reports against EU sustainability standards, determining whether companies have reported adequately on their nature-related impacts.
 
+## Example dashboard
+
+[CSRD Dashboard](https://siemenspinder.github.io/hackathon-csrd-dashboard/)
+
 ## Problem Statement
 
 Given a company's annual report, answer three questions:
