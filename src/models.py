@@ -45,8 +45,53 @@ class DisclosureExtraction(BaseModel):
 
 
 # =========================
-# STANDARD GROUPING (NO METADATA)
+# NTP DIMENSION SCORING
 # =========================
 
-class ESRSExtractionResult(BaseModel):
+NTPDimension = Literal[
+    "foundations",
+    "metrics_and_targets",
+    "implementation_strategy",
+    "engagement_strategy",
+    "governance",
+]
+
+
+class NTPDimensionScore(BaseModel):
+    score: int = Field(
+        ...,
+        ge=0,
+        le=3,
+        description=(
+            "Maturity level: "
+            "0=Non-aligned (problematic or absent disclosure), "
+            "1=Compliant (meets minimum CSRD/ESRS transparency requirements), "
+            "2=Coherent (goes beyond minimum; integrates some WWF/EFRAG expectations), "
+            "3=Credible (advanced maturity aligned with science-based frameworks and best practices)"
+        ),
+    )
+    rationale: str = Field(
+        ...,
+        description="One to two sentences explaining the score, citing specific evidence or naming what is missing",
+    )
+    evidence: List[Evidence] = Field(
+        default_factory=list,
+        description="Up to 3 verbatim quotes from the document that directly support this score",
+    )
+
+
+class NTPScoringResult(BaseModel):
+    foundations: NTPDimensionScore
+    metrics_and_targets: NTPDimensionScore
+    implementation_strategy: NTPDimensionScore
+    engagement_strategy: NTPDimensionScore
+    governance: NTPDimensionScore
+
+
+# =========================
+# COMBINED EXTRACTION RESULT
+# =========================
+
+class CombinedExtractionResult(BaseModel):
     disclosures: List[DisclosureExtraction]
+    ntp_scoring: NTPScoringResult

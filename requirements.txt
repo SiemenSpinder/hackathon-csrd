@@ -1,3 +1,3 @@
-mistralai
+openai
 python-dotenv
 pydantic

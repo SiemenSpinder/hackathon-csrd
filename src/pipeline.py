@@ -4,13 +4,13 @@ import json
 import os
 from typing import List
 
-from mistralai.client import Mistral
+from openai import AzureOpenAI
 
 from src.config import Config, load_config
 from src.esrs_ontology import enrich_with_ontology
-from src.models import ESRSExtractionResult
+from src.models import CombinedExtractionResult
 from src.prompts import system_prompt
-from src.utils.merge import merge_extractions
+from src.utils.merge import merge_extractions, merge_ntp_scores
 from src.utils.text import approx_tokens, chunk_markdown, clean_markdown
 
 
@@ -22,55 +22,70 @@ def _read_user_markdown(input_path: str) -> str:
 
 
 def run_pipeline(cfg: Config) -> None:
-    # Read and clean input
     user_text = _read_user_markdown(cfg.input_path)
     user_text = clean_markdown(user_text)
 
-    # Chunking logic
     approx_total = approx_tokens(user_text)
 
     if approx_total > cfg.max_total_tokens:
         chunks = chunk_markdown(user_text, cfg.chunk_tokens, cfg.chunk_overlap_tokens)
         print(
-            f"Input is ~{approx_total} tokens (> {cfg.max_total_tokens}). Splitting into {len(chunks)} chunks of ~{cfg.chunk_tokens} tokens with {cfg.chunk_overlap_tokens} overlap."
+            f"Input is ~{approx_total} tokens (> {cfg.max_total_tokens}). "
+            f"Splitting into {len(chunks)} chunks of ~{cfg.chunk_tokens} tokens with {cfg.chunk_overlap_tokens} overlap."
         )
     else:
         if approx_total > cfg.chunk_tokens:
             chunks = chunk_markdown(user_text, cfg.chunk_tokens, cfg.chunk_overlap_tokens)
             print(
-                f"Input is ~{approx_total} tokens. Splitting into {len(chunks)} chunks of ~{cfg.chunk_tokens} tokens with {cfg.chunk_overlap_tokens} overlap."
+                f"Input is ~{approx_total} tokens. "
+                f"Splitting into {len(chunks)} chunks of ~{cfg.chunk_tokens} tokens with {cfg.chunk_overlap_tokens} overlap."
             )
         else:
             chunks = [user_text]
             print(f"Input is ~{approx_total} tokens. Sending as a single request.")
 
-    # Mistral client
-    client = Mistral(api_key=cfg.api_key)
+    client = AzureOpenAI(
+        api_key=cfg.azure_api_key,
+        azure_endpoint=cfg.azure_endpoint,
+        api_version=cfg.azure_api_version,
+        timeout=cfg.timeout_ms / 1000,
+    )
 
-    # Call model over chunks with structured output
-    extractions: List[ESRSExtractionResult] = []
+    extractions: List[CombinedExtractionResult] = []
     for idx, chunk in enumerate(chunks, start=1):
         try:
-            chat_response = client.chat.parse(
+            chat_response = client.beta.chat.completions.parse(
                 model=cfg.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": chunk},
                 ],
-                response_format=ESRSExtractionResult,
-                max_tokens=cfg.max_generation_tokens,
+                response_format=CombinedExtractionResult,
+                max_completion_tokens=cfg.max_generation_tokens,
             )
-            parsed: ESRSExtractionResult = chat_response.choices[0].message.parsed
+            parsed: CombinedExtractionResult = chat_response.choices[0].message.parsed
             extractions.append(parsed)
-            print(f"Chunk {idx}/{len(chunks)} processed: {len(parsed.disclosures)} disclosures")
+            n_disc = len(parsed.disclosures)
+            ntp = parsed.ntp_scoring
+            print(
+                f"Chunk {idx}/{len(chunks)} — {n_disc} disclosures | "
+                f"NTP: foundations={ntp.foundations.score} "
+                f"metrics={ntp.metrics_and_targets.score} "
+                f"impl={ntp.implementation_strategy.score} "
+                f"engagement={ntp.engagement_strategy.score} "
+                f"governance={ntp.governance.score}"
+            )
         except Exception as e:
             print(f"Chunk {idx}/{len(chunks)} failed: {e}")
 
-    # Merge results
-    result = merge_extractions(extractions) if extractions else ESRSExtractionResult(disclosures=[])
+    if not extractions:
+        disclosures_merged = []
+        ntp_merged = None
+    else:
+        disclosures_merged = merge_extractions(extractions)
+        ntp_merged = merge_ntp_scores(extractions)
 
-    # Enrich and write output
-    enriched = enrich_with_ontology(result.model_dump())
+    enriched = enrich_with_ontology(disclosures_merged, ntp_merged)
 
     stem = os.path.splitext(os.path.basename(cfg.input_path))[0]
     output_key = f"{stem}.json"
@@ -81,7 +96,9 @@ def run_pipeline(cfg: Config) -> None:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
     print(f"Wrote output to {cfg.output_path}")
-    print(f"Key: {output_key} | Enriched disclosures: {len(enriched)}")
+    n_disc = len(enriched.get("disclosures", []))
+    total = enriched.get("ntp_scoring", {}).get("total_score", "n/a")
+    print(f"Key: {output_key} | Disclosures: {n_disc} | NTP total score: {total}/100")
 
 
 def main() -> None:

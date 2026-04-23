@@ -1,4 +1,4 @@
-from typing import Dict, TypedDict, Literal
+from typing import Any, Dict, List, Optional, TypedDict, Literal
 
 
 # =========================
@@ -237,21 +237,79 @@ ESRS_DISCLOSURES: Dict[ESRSCode, DisclosureDefinition] = {
     **E5_DISCLOSURES,
 }
 
-def enrich_with_ontology(result):
-    enriched = []
+# =========================
+# NTP SCORING WEIGHTS
+# Dimensions weighted out of 100, per WWF NAT40 framework:
+#   implementation_strategy gets the highest weight.
+# =========================
 
-    for d in result["disclosures"]:
-        definition = ESRS_DISCLOSURES[d["code"]]  # your ontology
+NTP_WEIGHTS = {
+    "foundations": 25,
+    "metrics_and_targets": 20,
+    "implementation_strategy": 30,
+    "engagement_strategy": 15,
+    "governance": 10,
+}
 
-        enriched.append({
-            "code": d["code"],
+NTP_MATURITY_LABELS = {
+    0: "Non-aligned",
+    1: "Compliant",
+    2: "Coherent",
+    3: "Credible",
+}
+
+
+def _compute_total_score(ntp_scoring: Dict[str, Any]) -> float:
+    total = 0.0
+    for dim, weight in NTP_WEIGHTS.items():
+        dim_score = ntp_scoring.get(dim, {}).get("score", 0)
+        total += (dim_score / 3) * weight
+    return round(total, 1)
+
+
+def enrich_with_ontology(
+    disclosures: List[Any],
+    ntp_scoring: Optional[Any] = None,
+) -> Dict[str, Any]:
+    enriched_disclosures = []
+    for d in disclosures:
+        code = d.code if hasattr(d, "code") else d["code"]
+        definition = ESRS_DISCLOSURES.get(code)
+        if definition is None:
+            continue
+        enriched_disclosures.append({
+            "code": code,
             "title": definition["title"],
             "description": definition["description"],
             "standard": definition["standard"],
-            "is_present": d["is_present"],
-            "confidence": d["confidence"],
-            "evidence": d["evidence"],
-            "metrics": d["metrics"]
+            "is_present": d.is_present if hasattr(d, "is_present") else d["is_present"],
+            "confidence": d.confidence if hasattr(d, "confidence") else d["confidence"],
+            "evidence": d.evidence if hasattr(d, "evidence") else d["evidence"],
+            "metrics": d.metrics if hasattr(d, "metrics") else d["metrics"],
         })
 
-    return enriched
+    result: Dict[str, Any] = {"disclosures": enriched_disclosures}
+
+    if ntp_scoring is not None:
+        ntp_dict = ntp_scoring.model_dump() if hasattr(ntp_scoring, "model_dump") else ntp_scoring
+        total = _compute_total_score(ntp_dict)
+
+        enriched_ntp: Dict[str, Any] = {}
+        for dim, weight in NTP_WEIGHTS.items():
+            dim_data = ntp_dict.get(dim, {})
+            score = dim_data.get("score", 0)
+            enriched_ntp[dim] = {
+                "score": score,
+                "maturity": NTP_MATURITY_LABELS.get(score, "Unknown"),
+                "weight": weight,
+                "weighted_contribution": round((score / 3) * weight, 1),
+                "rationale": dim_data.get("rationale", ""),
+                "evidence": dim_data.get("evidence", []),
+            }
+
+        result["ntp_scoring"] = {
+            **enriched_ntp,
+            "total_score": total,
+        }
+
+    return result
